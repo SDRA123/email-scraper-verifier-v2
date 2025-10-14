@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python main.py)",
+      "Bash(tasklist)",
+      "Bash(findstr /i python)",
+      "Bash(npm run build)",
+      "Bash(findstr /i /c:\"error\" /c:\"warning\" /c:\"eslint\")",
+      "Bash(npx eslint src/pages/Dashboard.tsx src/pages/DataManagement.tsx src/pages/EmailVerification.tsx --format compact)",
+      "Bash(python fix_database_schema.py)",
+      "Bash(tasklist /FI \"IMAGENAME eq python.exe\")",
+      "Bash(taskkill /F /PID 2928)",
+      "Bash(taskkill /F /IM python.exe)",
+      "Bash(python -c \"import os; os.system(''taskkill /F /IM python.exe'')\")",
+      "Bash(timeout 3)",
+      "Bash(python -c \"import sqlite3; conn = sqlite3.connect(''email_verifier.db''); cursor = conn.cursor(); cursor.execute(''SELECT sql FROM sqlite_master WHERE type=\"\"table\"\"''); print(''\\n''.join([row[0] for row in cursor.fetchall() if row[0]])); conn.close()\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
