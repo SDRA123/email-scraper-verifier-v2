@@ -14,7 +14,7 @@ import {
 
 class ApiService {
   private api: AxiosInstance;
-  private baseURL = 'http://localhost:8000/api';
+  private baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
   constructor() {
     this.api = axios.create({

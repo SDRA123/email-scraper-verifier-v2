@@ -18,11 +18,11 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
       - /app/node_modules
-      - /app/build
     environment:
-      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_API_URL=http://192.168.18.14:8000/api
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
