@@ -31,7 +31,7 @@ class EmailVerifier:
         self.quick_mode = quick_mode
         
         # Configuration
-        self.smtp_timeout = 15
+        self.smtp_timeout =15
         self.smtp_helo_domain = self._get_smart_helo_domain()
         self.smtp_mail_from = f"probe@{self.smtp_helo_domain}"
         
@@ -165,7 +165,7 @@ class EmailVerifier:
                 return self._mx_cache[domain]
         
         try:
-            answers = dns.resolver.resolve(domain, 'MX', lifetime=self.smtp_timeout)
+            answers = dns.resolver.resolve(domain, 'MX', lifetime=5)
             # sort by preference (lowest first), strip trailing dots
             hosts = [str(r.exchange).rstrip('.') for r in sorted(answers, key=lambda r: r.preference)]
             res = (hosts, "mx_ok")
@@ -434,7 +434,7 @@ class BlogChecker:
     Based on the original checkforblogpage.py with comprehensive detection algorithms
     """
     
-    def __init__(self, max_workers: int = 20, timeout: int = 40):
+    def __init__(self, max_workers: int = 20, timeout: int = 15):
         self.max_workers = max_workers
         self.timeout = timeout
         self.headers = {
@@ -1066,8 +1066,8 @@ class EmailScraper:
         session = requests.Session()
         retries = Retry(total=2, backoff_factor=0.2, status_forcelist=[429, 500, 502, 503, 504])
         # Increased pool size for better parallel performance
-        session.mount("http://", HTTPAdapter(max_retries=retries, pool_connections=200, pool_maxsize=200))
-        session.mount("https://", HTTPAdapter(max_retries=retries, pool_connections=200, pool_maxsize=200))
+        session.mount("http://", HTTPAdapter(max_retries=retries, pool_connections=128, pool_maxsize=128))
+        session.mount("https://", HTTPAdapter(max_retries=retries, pool_connections=128, pool_maxsize=128))
         session.headers.update({
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
