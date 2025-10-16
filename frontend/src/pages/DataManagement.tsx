@@ -53,7 +53,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { EmailData } from '../types';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000';
 
 interface CustomFilterToolbarProps {
   onAddFilter: () => void;

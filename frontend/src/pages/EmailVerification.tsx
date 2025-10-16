@@ -553,7 +553,8 @@ const EmailVerification: React.FC = () => {
   // WebSocket connection for real-time updates
 
   const connectWebSocket = (processId: string) => {
-    const websocket = new WebSocket(`ws://localhost:8000/ws/${processId}`);
+    const wsUrl = process.env.REACT_APP_API_URL?.replace('http://', 'ws://').replace('/api', '') || 'ws://localhost:8000';
+    const websocket = new WebSocket(`${wsUrl}/ws/${processId}`);
     
     websocket.onmessage = (event) => {
       const data = JSON.parse(event.data);

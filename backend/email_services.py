@@ -434,7 +434,7 @@ class BlogChecker:
     Based on the original checkforblogpage.py with comprehensive detection algorithms
     """
     
-    def __init__(self, max_workers: int = 20, timeout: int = 20):
+    def __init__(self, max_workers: int = 20, timeout: int = 40):
         self.max_workers = max_workers
         self.timeout = timeout
         self.headers = {
@@ -1026,8 +1026,8 @@ class EmailScraper:
         
         # Constants from original - INCREASED for better performance
         self.MAX_WORKERS = 16
-        self.HTTP_TIMEOUT = 4
-        self.SMTP_TIMEOUT = 5
+        self.HTTP_TIMEOUT = 10
+        self.SMTP_TIMEOUT = 10
         self.SMTP_HELO_DOMAIN = self._get_smart_helo_domain()
         self.SMTP_MAIL_FROM = f"probe@{self.SMTP_HELO_DOMAIN}"
         
