@@ -25,13 +25,13 @@ class EmailVerifier:
     Based on the original emailverifier.py with all features intact
     """
     
-    def __init__(self, enable_smtp: bool = True, max_workers: int = 32, quick_mode: bool = True):
+    def __init__(self, enable_smtp: bool = True, max_workers: int = 16, quick_mode: bool = True):
         self.enable_smtp = enable_smtp
         self.max_workers = max_workers
         self.quick_mode = quick_mode
         
         # Configuration
-        self.smtp_timeout = 8
+        self.smtp_timeout = 15
         self.smtp_helo_domain = self._get_smart_helo_domain()
         self.smtp_mail_from = f"probe@{self.smtp_helo_domain}"
         
@@ -434,7 +434,7 @@ class BlogChecker:
     Based on the original checkforblogpage.py with comprehensive detection algorithms
     """
     
-    def __init__(self, max_workers: int = 20, timeout: int = 10):
+    def __init__(self, max_workers: int = 20, timeout: int = 20):
         self.max_workers = max_workers
         self.timeout = timeout
         self.headers = {
