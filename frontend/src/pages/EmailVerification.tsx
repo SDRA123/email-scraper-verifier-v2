@@ -1399,7 +1399,7 @@ const startPipeline = async () => {
     if (bIndex === -1) return -1;
     return aIndex - bIndex;
   });
-
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" gutterBottom>
@@ -2100,81 +2100,72 @@ const startPipeline = async () => {
               sx={{ width: '100%' }}
               onMouseUp={handleRowMouseUp}
             >
-              <DataGrid
-                rows={gridRows}
-                columns={columns}
-                autoHeight={false}
-                loading={loadingEmails}
-                hideFooter={true}
-                onRowClick={handleRowClick}
-                slots={{
-                  toolbar: () => (
-                    <CustomToolbar 
-                      onAddFilter={handleAddFilter} 
-                      filterCount={filterModel.items.length}
-                    />
-                  ),
-                }}
-                filterMode="client"
-                slotProps={{
-                  filterPanel: {
-                    logicOperators: [GridLogicOperator.And, GridLogicOperator.Or],
-                    columnsSort: 'asc',
-                    filterFormProps: {
-                      logicOperatorInputProps: {
-                        variant: 'outlined',
-                        size: 'small',
-                      },
-                      columnInputProps: {
-                        variant: 'outlined',
-                        size: 'small',
-                      },
-                      operatorInputProps: {
-                        variant: 'outlined',
-                        size: 'small',
-                      },
-                      valueInputProps: {
-                        variant: 'outlined',
-                        size: 'small',
-                      },
-                    },
+            <DataGrid
+              rows={gridRows}
+              columns={columns}
+
+              /* Pagination */
+              pagination
+              paginationModel={paginationModel}
+              onPaginationModelChange={setPaginationModel}
+              pageSizeOptions={[10, 25, 50, 100]}
+              hideFooter={false}
+
+              /* Loading + basic table config */
+              loading={loadingEmails}
+              autoHeight={false}
+              rowHeight={52}
+              columnHeaderHeight={56}
+
+              /* Selection: keep your custom click + drag behavior */
+              onRowClick={handleRowClick}
+              getRowClassName={(params) => (selectedRows.includes(params.id) ? 'row-selected' : '')}
+              disableVirtualization={false}
+
+              /* Toolbar (your CustomToolbar) */
+              slots={{
+                toolbar: () => (
+                  <CustomToolbar
+                    onAddFilter={handleAddFilter}
+                    filterCount={filterModel.items.length}
+                  />
+                ),
+              }}
+
+              /* Client-side filtering (you already apply custom filters before passing rows) */
+              filterMode="client"
+              slotProps={{
+                filterPanel: {
+                  logicOperators: [GridLogicOperator.And, GridLogicOperator.Or],
+                  columnsSort: 'asc',
+                  filterFormProps: {
+                    logicOperatorInputProps: { variant: 'outlined', size: 'small' },
+                    columnInputProps: { variant: 'outlined', size: 'small' },
+                    operatorInputProps: { variant: 'outlined', size: 'small' },
+                    valueInputProps: { variant: 'outlined', size: 'small' },
                   },
-                }}
-                sx={{
-                  height: '600px',
-                  '& .MuiDataGrid-cell': {
-                    fontSize: '0.875rem',
-                  },
-                  '& .MuiDataGrid-row': {
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                    '&:hover': {
-                      backgroundColor: 'action.hover',
-                    },
-                  },
-                  '& .MuiDataGrid-virtualScroller': {
-                    overflowY: 'auto !important',
-                  },
-                  '& .row-selected': {
-                    backgroundColor: 'rgba(25, 118, 210, 0.12) !important',
-                    '&:hover': {
-                      backgroundColor: 'rgba(25, 118, 210, 0.24) !important',
-                    },
-                  },
-                  '& .MuiDataGrid-filterForm': {
-                    gap: 1,
-                  },
-                  '& .MuiDataGrid-filterFormLogicOperatorInput': {
-                    mr: 2,
-                  },
-                }}
-                getRowClassName={(params) => 
-                  selectedRows.includes(params.id) ? 'row-selected' : ''
-                }
-                disableVirtualization={false}
-                rowHeight={52}
-                columnHeaderHeight={56}
-              />
+                },
+              }}
+
+              /* Styling (kept from your original) */
+              sx={{
+                height: '600px',
+                '& .MuiDataGrid-cell': { fontSize: '0.875rem' },
+                '& .MuiDataGrid-row': {
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { backgroundColor: 'action.hover' },
+                },
+                '& .MuiDataGrid-virtualScroller': { overflowY: 'auto !important' },
+                '& .row-selected': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.12) !important',
+                  '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.24) !important' },
+                },
+                '& .MuiDataGrid-filterForm': { gap: 1 },
+                '& .MuiDataGrid-filterFormLogicOperatorInput': { mr: 2 },
+              }}
+            />
+
             </Box>
           </CardContent>
         </Card>

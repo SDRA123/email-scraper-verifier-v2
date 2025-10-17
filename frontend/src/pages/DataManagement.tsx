@@ -921,7 +921,7 @@ const DataManagement: React.FC = () => {
   ];
 
   // Columns are now manually ordered in the desired sequence
-
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   return (
     <Box sx={{ p: 3 }}>
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
@@ -1198,8 +1198,20 @@ const DataManagement: React.FC = () => {
           columns={columns}
           loading={loading}
           getRowId={(row) => row.id || row.row_id}
-          hideFooter={true}
+
+          /* ✅ Pagination */
+          pagination
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[10, 25, 50, 100]}
+          hideFooter={false}            /* show pager + page-size selector */
+
+          /* Selection + behavior you already had */
           onRowClick={handleRowClick}
+          getRowClassName={(params) => (selectedRows.includes(params.id) ? 'row-selected' : '')}
+          disableVirtualization={false}
+
+          /* Toolbar (kept) */
           slots={{
             toolbar: () => (
               <CustomToolbar 
@@ -1208,43 +1220,32 @@ const DataManagement: React.FC = () => {
               />
             ),
           }}
+
+          /* Styling (kept) */
           sx={{
             height: '100%',
             width: '100%',
-            '& .MuiDataGrid-cell': {
-              fontSize: '0.875rem',
-            },
+            '& .MuiDataGrid-cell': { fontSize: '0.875rem' },
             '& .MuiDataGrid-row': {
               cursor: 'pointer',
               userSelect: 'none',
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
+              '&:hover': { backgroundColor: 'action.hover' },
             },
-            '& .MuiDataGrid-virtualScroller': {
-              overflowY: 'auto !important',
-            },
+            '& .MuiDataGrid-virtualScroller': { overflowY: 'auto !important' },
             '& .row-selected': {
               backgroundColor: 'rgba(25, 118, 210, 0.12) !important',
-              '&:hover': {
-                backgroundColor: 'rgba(25, 118, 210, 0.24) !important',
-              },
+              '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.24) !important' },
             },
-            '& .MuiDataGrid-filterForm': {
-              gap: 1,
-            },
-            '& .MuiDataGrid-filterFormLogicOperatorInput': {
-              mr: 2,
-            },
+            '& .MuiDataGrid-filterForm': { gap: 1 },
+            '& .MuiDataGrid-filterFormLogicOperatorInput': { mr: 2 },
           }}
-          getRowClassName={(params) => 
-            selectedRows.includes(params.id) ? 'row-selected' : ''
-          }
+
           autoHeight={false}
           rowHeight={52}
           columnHeaderHeight={56}
-          disableVirtualization={false}
+          filterMode="client"
         />
+
       </Paper>
 
       {/* Edit Dialog */}
