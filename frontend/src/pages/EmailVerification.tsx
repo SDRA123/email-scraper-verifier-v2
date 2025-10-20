@@ -349,6 +349,21 @@ const EmailVerification: React.FC = () => {
           await fetchActiveProcesses();
           
           return true; // Stop monitoring
+        } else if (status.status === 'stopped') {
+          setMessage({
+            type: 'info',
+            text: `Process stopped by user`,
+          });
+          
+          // Refresh email data if we have a current upload
+          if (currentDataId) {
+            await loadEmailData(currentDataId);
+          }
+          
+          // Refresh active processes
+          await fetchActiveProcesses();
+          
+          return true; // Stop monitoring
         } else if (status.status === 'failed' || status.status === 'error') {
           setMessage({
             type: 'error',
@@ -826,7 +841,14 @@ const startPipeline = async () => {
         type: 'info',
         text: `Process ${processId.substring(0, 8)} stopped`,
       });
+      
+      // Immediately refresh active processes to remove from UI
       await fetchActiveProcesses();
+      
+      // Refresh email data to show any partial results saved before stopping
+      if (currentDataId) {
+        await loadEmailData(currentDataId);
+      }
     } catch (error) {
       setMessage({
         type: 'error',
@@ -1036,6 +1058,19 @@ const startPipeline = async () => {
       flex: 0.8,
       sortable: true,
       filterable: true,
+      renderCell: (params) => (
+        <Tooltip title={params.value || ''} arrow placement="top">
+          <span style={{ 
+            cursor: 'pointer', 
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            display: 'block',
+            maxWidth: '100%'
+          }}>
+            {params.value || '—'}
+          </span>
+        </Tooltip>
+      ),
     },
     { 
       field: 'email', 
@@ -1044,6 +1079,19 @@ const startPipeline = async () => {
       flex: 0.9,
       sortable: true,
       filterable: true,
+      renderCell: (params) => (
+        <Tooltip title={params.value || ''} arrow placement="top">
+          <span style={{ 
+            cursor: 'pointer', 
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            display: 'block',
+            maxWidth: '100%'
+          }}>
+            {params.value || '—'}
+          </span>
+        </Tooltip>
+      ),
     },
     {
       field: 'verification_quality',
@@ -1111,6 +1159,19 @@ const startPipeline = async () => {
       flex: 0.9,
       sortable: true,
       filterable: true,
+      renderCell: (params) => (
+        <Tooltip title={params.value || ''} arrow placement="top">
+          <span style={{ 
+            cursor: 'pointer', 
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            display: 'block',
+            maxWidth: '100%'
+          }}>
+            {params.value || '—'}
+          </span>
+        </Tooltip>
+      ),
     },
     {
       field: 'email_2_quality',
@@ -1177,6 +1238,19 @@ const startPipeline = async () => {
       flex: 0.9,
       sortable: true,
       filterable: true,
+      renderCell: (params) => (
+        <Tooltip title={params.value || ''} arrow placement="top">
+          <span style={{ 
+            cursor: 'pointer', 
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            display: 'block',
+            maxWidth: '100%'
+          }}>
+            {params.value || '—'}
+          </span>
+        </Tooltip>
+      ),
     },
     {
       field: 'email_3_quality',
@@ -1243,7 +1317,19 @@ const startPipeline = async () => {
       flex: 0.7,
       sortable: true,
       filterable: true,
-      renderCell: (params) => params.value || '—',
+      renderCell: (params) => (
+        <Tooltip title={params.value || ''} arrow placement="top">
+          <span style={{ 
+            cursor: 'pointer', 
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            display: 'block',
+            maxWidth: '100%'
+          }}>
+            {params.value || '—'}
+          </span>
+        </Tooltip>
+      ),
     },
     {
       field: 'links',
@@ -1414,7 +1500,7 @@ const startPipeline = async () => {
 
       {/* Active Processes Banner */}
       {activeProcesses.length > 0 && (
-        <Card sx={{ mb: 3, bgcolor: '#f5f5f5' }}>
+        <Card sx={{ mb: 3, bgcolor: 'background.paper' }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
               <Timeline sx={{ mr: 1 }} />

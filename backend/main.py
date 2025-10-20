@@ -131,6 +131,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:3000", 
         "http://192.168.18.14:3000",
+        "http://192.168.18.7:3000",
         "http://0.0.0.0:3000"
     ],
     allow_credentials=True,
@@ -1752,6 +1753,7 @@ async def stop_pipeline(
         process_info = pipeline_manager.active_processes[process_id]
         process_info['status'] = 'stopped'
         process_info['end_time'] = datetime.now()
+        process_info['finished'] = True
         
         await pipeline_manager.send_progress(process_id, {
             'type': 'stopped',

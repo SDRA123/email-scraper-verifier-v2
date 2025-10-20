@@ -472,6 +472,10 @@ class ProcessingPipeline:
 
         async def process_item(index: int, item: Dict[str, Any]) -> Dict[str, Any]:
             nonlocal processed
+            # Check if process was stopped before starting
+            if self.active_processes.get(process_id, {}).get('status') != 'running':
+                raise asyncio.CancelledError("Process stopped by user")
+            
             prepared_url = self._prepare_url(item.get('url') or item.get('domain') or item.get('website', ''))
             if prepared_url:
                 async with pool:
@@ -534,6 +538,15 @@ class ProcessingPipeline:
             # Process tasks in batches to avoid overwhelming system
             batch_size = 25
             for i in range(0, len(tasks), batch_size):
+                # Check if process was stopped
+                if self.active_processes.get(process_id, {}).get('status') != 'running':
+                    print(f"[pipeline] Blog check stopped by user, canceling remaining tasks")
+                    # Cancel all remaining tasks
+                    for task in tasks[i:]:
+                        if not task.done():
+                            task.cancel()
+                    break
+                
                 batch = tasks[i:i + batch_size]
                 
                 try:
@@ -544,7 +557,10 @@ class ProcessingPipeline:
                     
                     for result in batch_results:
                         if isinstance(result, Exception):
-                            print(f"[pipeline] Task failed in blog_check: {result}")
+                            if isinstance(result, asyncio.CancelledError):
+                                print(f"[pipeline] Task cancelled in blog_check")
+                            else:
+                                print(f"[pipeline] Task failed in blog_check: {result}")
                             continue
                         
                         all_results.append(result)
@@ -600,6 +616,10 @@ class ProcessingPipeline:
 
         async def process_item(index: int, item: Dict[str, Any]) -> Dict[str, Any]:
             nonlocal processed
+            # Check if process was stopped before starting
+            if self.active_processes.get(process_id, {}).get('status') != 'running':
+                raise asyncio.CancelledError("Process stopped by user")
+            
             raw_url = item.get('url') or item.get('domain') or item.get('website', '')
             prepared_url = self._prepare_url(raw_url)
             if prepared_url:
@@ -657,6 +677,15 @@ class ProcessingPipeline:
             # Process tasks in batches to avoid overwhelming system
             batch_size = 20
             for i in range(0, len(tasks), batch_size):
+                # Check if process was stopped
+                if self.active_processes.get(process_id, {}).get('status') != 'running':
+                    print(f"[pipeline] Email scrape stopped by user, canceling remaining tasks")
+                    # Cancel all remaining tasks
+                    for task in tasks[i:]:
+                        if not task.done():
+                            task.cancel()
+                    break
+                
                 batch = tasks[i:i + batch_size]
                 
                 try:
@@ -667,7 +696,10 @@ class ProcessingPipeline:
                     
                     for result in batch_results:
                         if isinstance(result, Exception):
-                            print(f"[pipeline] Task failed in email_scrape: {result}")
+                            if isinstance(result, asyncio.CancelledError):
+                                print(f"[pipeline] Task cancelled in email_scrape")
+                            else:
+                                print(f"[pipeline] Task failed in email_scrape: {result}")
                             continue
                         
                         all_results.append(result)
@@ -750,6 +782,10 @@ class ProcessingPipeline:
         results_chunk = []
 
         async def verify_email(email: str) -> tuple[str, Dict[str, Any]]:
+            # Check if process was stopped before starting
+            if self.active_processes.get(process_id, {}).get('status') != 'running':
+                raise asyncio.CancelledError("Process stopped by user")
+            
             async with pool:
                 try:
                     # Add timeout for individual email verification (60 seconds max per email)
@@ -787,6 +823,15 @@ class ProcessingPipeline:
             # Process tasks in batches
             batch_size = 30
             for i in range(0, len(tasks), batch_size):
+                # Check if process was stopped
+                if self.active_processes.get(process_id, {}).get('status') != 'running':
+                    print(f"[pipeline] Email verify stopped by user, canceling remaining tasks")
+                    # Cancel all remaining tasks
+                    for task in tasks[i:]:
+                        if not task.done():
+                            task.cancel()
+                    break
+                
                 batch = tasks[i:i + batch_size]
                 
                 try:
@@ -797,7 +842,10 @@ class ProcessingPipeline:
                     
                     for result in batch_results:
                         if isinstance(result, Exception):
-                            print(f"[pipeline] Task failed in email_verify: {result}")
+                            if isinstance(result, asyncio.CancelledError):
+                                print(f"[pipeline] Task cancelled in email_verify")
+                            else:
+                                print(f"[pipeline] Task failed in email_verify: {result}")
                             continue
                             
                         email, verification = result
@@ -913,13 +961,17 @@ class ProcessingPipeline:
         return self.active_processes.get(process_id, {'status': 'not_found'})
         
     def get_all_processes(self, user_id: int) -> List[Dict[str, Any]]:
-        """Get all processes for a user"""
+        """Get all processes for a user (only active/running processes)"""
         user_processes = []
         for pid, process in self.active_processes.items():
             if process.get('user_id') == user_id:
-                process_info = process.copy()
-                process_info['process_id'] = pid
-                user_processes.append(process_info)
+                # Only return processes that are actively running
+                # Exclude stopped, completed, failed, timeout, or finished processes
+                status = process.get('status')
+                if status == 'running':
+                    process_info = process.copy()
+                    process_info['process_id'] = pid
+                    user_processes.append(process_info)
         return user_processes
 
 # Global pipeline manager
