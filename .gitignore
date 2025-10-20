@@ -56,6 +56,15 @@ coverage.xml
 local_settings.py
 db.sqlite3
 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
+email_verifier.db
+
 # Flask stuff:
 instance/
 .webassets-cache
